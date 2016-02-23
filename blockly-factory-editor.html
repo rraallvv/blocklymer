@@ -6,10 +6,37 @@
 		<style>
 			:host {
 				position: relative;
+				overflow: scroll;
+				background-color: #272822;
+			}
+
+			#defCodeEditor {
+				/* not sure why part of the top is shifted outside */
+				margin-top: 4px;
+			}
+
+			#defCodeEditor ::content .ace_cursor-layer {
+				/* hide cursor in def code editor */
+				display: none;
+			}
+
+			/* sync gutter size between editors */
+			#defCodeEditor[pd="1"] ::content .ace_gutter-layer {
+				width: 48px !important;
+			}
+			#defCodeEditor[pd="1"] ::content .ace_scroller {
+				left: 48px !important;
+			}
+			#defCodeEditor[pd="2"] ::content .ace_gutter-layer {
+				width: 55px !important;
+			}
+			#defCodeEditor[pd="2"] ::content .ace_scroller {
+				left: 55px !important;
 			}
 		</style>
 
-		<div id="editor" class="fl-full"></div>
+		<div id="defCodeEditor"></div>
+		<div id="implCodeEditor"></div>
 	</template>
 
 	<script>
@@ -19,22 +46,76 @@
 			is: 'blockly-factory-editor',
 
 			properties: {
-				code: {
+				defCode: {
 					type: String,
 					notify: true,
-					observer: 'onCodeChange_'
+					observer: 'onDefCodeChange_'
 				}
 			},
 
-			ready() {
-				this.editor = ace.edit(this.$.editor);
-				this.editor.setTheme("ace/theme/monokai");
-				this.editor.getSession().setMode("ace/mode/javascript");
-				this.editor.$blockScrolling = Infinity;
+			listeners: {
+				'tap': 'onTap_'
 			},
 
-			onCodeChange_(code) {
-				this.editor.setValue(code, 1);
+			ready() {
+				let theme = 'ace/theme/monokai',
+					mode = 'ace/mode/javascript',
+					maxLines = Infinity,
+					options = {maxLines},
+					defCodeEditor = ace.edit(this.$.defCodeEditor),
+					implCodeEditor = ace.edit(this.$.implCodeEditor);
+
+				defCodeEditor.setTheme(theme);
+				defCodeEditor.setReadOnly(true);
+				defCodeEditor.setHighlightGutterLine(false);
+				defCodeEditor.setHighlightActiveLine(false);
+				defCodeEditor.setShowPrintMargin(false);
+				defCodeEditor.setOptions(options);
+				defCodeEditor.getSession().setMode(mode);
+				defCodeEditor.$blockScrolling = Infinity;
+				defCodeEditor.on('change', this.onDefCodeEditorChange_.bind(this));
+
+				implCodeEditor.setTheme(theme);
+				implCodeEditor.setShowPrintMargin(false);
+				implCodeEditor.setOptions(options);
+				implCodeEditor.getSession().setMode(mode);
+				implCodeEditor.$blockScrolling = Infinity;
+				implCodeEditor.on('change', this.onImplCodeEditorChange_.bind(this));
+				
+				this.defCodeEditor = defCodeEditor;
+				this.implCodeEditor = implCodeEditor;
+			},
+
+			get defCodeLength() {
+				return this.defCodeEditor.getSession().getDocument().getLength();
+			},
+
+			get implCodeLength() {
+				return this.implCodeEditor.getSession().getDocument().getLength();
+			},
+
+			onDefCodeChange_(code) {
+				this.defCodeEditor.setValue(code, 1);
+			},
+
+			onDefCodeEditorChange_() {
+				this.implCodeEditor.setOption('firstLineNumber', this.defCodeLength + 1);
+			},
+
+			onImplCodeEditorChange_() {
+				let defLength = this.defCodeLength,
+					implLength = this.implCodeLength + defLength,
+					diff = implLength.toString().length - defLength.toString().length;
+				if(diff > 0) {
+					// pd = padding diff
+					this.$.defCodeEditor.setAttribute('pd', diff);
+				}
+			},
+
+			onTap_(e) {
+				if(e.target === this) {
+					this.implCodeEditor.focus();
+				}
 			}
 		});
 	</script>

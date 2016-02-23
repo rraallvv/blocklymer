@@ -23,7 +23,7 @@
 		<div id="wrapper" class="fl-full fl-hbox">
 			<div class="fl-vbox">
 				<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
-				<blockly-factory-preview id="preview" source="workspace" dynamic-size></blockly-factory-preview>
+				<blockly-factory-preview id="preview" source="workspace" dynamic-height></blockly-factory-preview>
 			</div>
 			<blockly-factory-editor id="editor"></blockly-factory-editor>
 		</div>
@@ -36,7 +36,7 @@
 			is: 'blockly-factory',
 
 			onWorkspaceChange_() {
-				this.$.editor.code = this.$.workspace.code;
+				this.$.editor.defCode = this.$.workspace.code;
 			}
 		});
 	</script>

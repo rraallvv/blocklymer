@@ -22,7 +22,7 @@
 
 			properties: {
 				source: String,
-				dynamicSize: Boolean,
+				dynamicHeight: Boolean,
 				factoryEditor: {
 					type: Element,
 					computed: 'getFactoryEditor_(source, attached_)'
@@ -98,7 +98,7 @@
 					Blockly.Blocks = backupBlocks;
 				}
 
-				if(this.dynamicSize) {
+				if(this.dynamicHeight) {
 					let height = workspace.getTopBlocks(false)[0].height;
 					this.style.height = `${height + 30}px`;
 				}
