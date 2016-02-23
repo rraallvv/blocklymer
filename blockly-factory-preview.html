@@ -22,6 +22,7 @@
 
 			properties: {
 				source: String,
+				dynamicSize: Boolean,
 				factoryEditor: {
 					type: Element,
 					computed: 'getFactoryEditor_(source, attached_)'
@@ -52,7 +53,9 @@
 			 * Update the preview display.
 			 */
 			refresh() {
-				this.$.preview.workspace.clear();
+				let workspace = this.$.preview.workspace;
+				workspace.clear();
+
 				let code = this.factoryEditor ? this.factoryEditor.code.trim() : '';
 
 				if (!code) {
@@ -85,7 +88,7 @@
 					}
 
 					// Create the preview block.
-					var previewBlock = this.$.preview.workspace.newBlock(blockType);
+					var previewBlock = workspace.newBlock(blockType);
 					previewBlock.initSvg();
 					previewBlock.render();
 					previewBlock.setMovable(false);
@@ -93,6 +96,11 @@
 					previewBlock.moveBy(15, 10);
 				} finally {
 					Blockly.Blocks = backupBlocks;
+				}
+
+				if(this.dynamicSize) {
+					let height = workspace.getTopBlocks(false)[0].height;
+					this.style.height = `${height + 30}px`;
 				}
 			}
 		});

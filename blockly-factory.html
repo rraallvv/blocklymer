@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="./blockly-factory-workspace.html">
 <link rel="import" href="./blockly-factory-preview.html">
+<link rel="import" href="./blockly-factory-editor.html">
 <link rel="stylesheet" type="text/css" href="../flexb0x/flexb0x.css">
 
 <dom-module id="blockly-factory">
@@ -14,25 +15,17 @@
 				width: 50%;
 			}
 
-			#preview {
-				height: 150px;
-			}
 			#preview ::content .blocklyMainBackground {
 				stroke: none;
-			}
-
-			pre {
-				margin: 0;
-				padding: 10px;
 			}
 		</style>
 
 		<div id="wrapper" class="fl-full fl-hbox">
-			<blockly-factory-workspace id="workspace" on-change="onWorkspaceChange_"></blockly-factory-workspace>
 			<div class="fl-vbox">
-				<blockly-factory-preview id="preview" source="workspace"></blockly-factory-preview>
-				<pre class="fl-fatty"><code id="code"></code></pre>
+				<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
+				<blockly-factory-preview id="preview" source="workspace" dynamic-size></blockly-factory-preview>
 			</div>
+			<blockly-factory-editor id="editor"></blockly-factory-editor>
 		</div>
 	</template>
 
@@ -43,7 +36,7 @@
 			is: 'blockly-factory',
 
 			onWorkspaceChange_() {
-				this.$.code.textContent = this.$.workspace.code;
+				this.$.editor.code = this.$.workspace.code;
 			}
 		});
 	</script>

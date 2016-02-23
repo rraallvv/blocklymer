@@ -91,6 +91,12 @@
 				this.onWindowResize_();
 			},
 
+			set toolbox(value) {
+				// Changing the toolbox
+				// https://developers.google.com/blockly/installation/toolbox#changing_the_toolbox
+				this.workspace.updateToolbox(value);
+			},
+
 			get toolboxElement() {
 				return this.getContentChildren('#toolbox')[0];
 			},

@@ -1,0 +1,41 @@
+<link rel="import" href="../polymer/polymer.html">
+<script src="../ace-builds/src-min-noconflict/ace.js"></script>
+
+<dom-module id="blockly-factory-editor">
+	<template>
+		<style>
+			:host {
+				position: relative;
+			}
+		</style>
+
+		<div id="editor" class="fl-full"></div>
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'blockly-factory-editor',
+
+			properties: {
+				code: {
+					type: String,
+					notify: true,
+					observer: 'onCodeChange_'
+				}
+			},
+
+			ready() {
+				this.editor = ace.edit(this.$.editor);
+				this.editor.setTheme("ace/theme/monokai");
+				this.editor.getSession().setMode("ace/mode/javascript");
+				this.editor.$blockScrolling = Infinity;
+			},
+
+			onCodeChange_(code) {
+				this.editor.setValue(code, 1);
+			}
+		});
+	</script>
+</dom-module>
