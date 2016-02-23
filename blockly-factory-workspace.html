@@ -76,8 +76,15 @@
 		Polymer({
 			is: 'blockly-factory-workspace',
 
+			properties: {
+				code: {
+					type: String,
+					notify: true
+				}
+			},
+
 			// get the generated block definition code
-			get code() {
+			get code_() {
 				let rootBlock = this.rootBlock_;
 				if (!rootBlock) {
 					return '';
@@ -91,6 +98,7 @@
 			},
 
 			onEditorChange_() {
+				this.code = this.code_;
 				this.fire('change');
 			},
 

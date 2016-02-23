@@ -13,11 +13,26 @@
 			#wrapper > * {
 				width: 50%;
 			}
+
+			#preview {
+				height: 150px;
+			}
+			#preview ::content .blocklyMainBackground {
+				stroke: none;
+			}
+
+			pre {
+				margin: 0;
+				padding: 10px;
+			}
 		</style>
 
 		<div id="wrapper" class="fl-full fl-hbox">
-			<blockly-factory-workspace id="editor"></blockly-factory-workspace>
-			<blockly-factory-preview id="preview" source="editor"></blockly-factory-preview>
+			<blockly-factory-workspace id="workspace" on-change="onWorkspaceChange_"></blockly-factory-workspace>
+			<div class="fl-vbox">
+				<blockly-factory-preview id="preview" source="workspace"></blockly-factory-preview>
+				<pre class="fl-fatty"><code id="code"></code></pre>
+			</div>
 		</div>
 	</template>
 
@@ -25,7 +40,11 @@
 		'use strict';
 
 		Polymer({
-			is: 'blockly-factory'
+			is: 'blockly-factory',
+
+			onWorkspaceChange_() {
+				this.$.code.textContent = this.$.workspace.code;
+			}
 		});
 	</script>
 </dom-module>
