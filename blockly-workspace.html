@@ -1,0 +1,129 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./blockly.html">
+
+<dom-module id="blockly-workspace">
+	<template>
+		<style>
+			:host {
+				position: relative;
+				display: block;
+			}
+
+			:host ::content xml {
+				display: none;
+			}
+
+			#blockDiv {
+				position: absolute;
+			}
+		</style>
+
+		<div id="blockDiv"></div>
+		<content id="toolbox" select="xml.toolbox"></content>
+		<content id="blocks" select="xml.blocks"></content>
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'blockly-workspace',
+
+			properties: {
+				// workspace properties
+				resizable: Boolean,
+
+				// grid properties
+				grid: 			Boolean,
+				snap: 			Boolean,
+				gridSpacing: 	{type:Number, value:20},
+				gridSize: 		{type:Number, value:5},
+				gridColor: 		{type:String, value:'#ddd'},
+
+				// zooming properties
+				zoomControls: 	Boolean,
+				zoomWheel: 		Boolean,
+				zoomStartScale: {type:Number, value:1.0},
+				zoomMinScale: 	{type:Number, value:0.3},
+				zoomMaxScale: 	{type:Number, value:3.0},
+				zoomScaleSpeed: {type:Number, value:1.2}
+			},
+
+			ready() {
+				// update editor size when element is resized
+				if(this.resizable) {
+					window.addEventListener('resize', this.onWindowResize_.bind(this));
+				}
+
+				// initialize toolbox and workspace
+				let toolbox = this.toolboxElement;
+				setTimeout(() => {
+					// create workspace
+					this.workspace = Blockly.inject(this.$.blockDiv, {
+						media: '../google-blockly/media/',
+						grid: this.grid ? {
+							spacing: 	this.gridSpacing,
+							length: 	this.gridSize,
+							colour: 	this.gridColor,
+							snap: 		this.snap
+						} : null,
+						zoom: (this.zoomControls || this.zoomWheel) ? {
+							controls: 	this.zoomControls,
+							wheel: 		this.zoomWheel,
+							startScale: this.zoomStartScale,
+							maxScale: 	this.zoomMaxScale,
+							minScale: 	this.zoomMinScale,
+							scaleSpeed: this.zoomScaleSpeed
+						} : null,
+						toolbox
+					});
+
+					// populate with blocks
+					let blocks = this.initialBlocksElement;
+					blocks && Blockly.Xml.domToWorkspace(this.workspace, blocks);
+
+					// observe changes
+					this.workspace.addChangeListener(this.onWorkspaceChange_.bind(this));
+				}, 0);
+			},
+
+			attached() {
+				this.onWindowResize_();
+			},
+
+			get toolboxElement() {
+				return this.getContentChildren('#toolbox')[0];
+			},
+
+			get initialBlocksElement() {
+				return this.getContentChildren('#blocks')[0];
+			},
+
+			// workspace -> xml text
+			get xmlText() {
+				return this.workspace && Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(this.workspace));
+			},
+
+			// xml text -> workspace
+			set xmlText(value) {
+				if(this.workspace) {
+					Blockly.Xml/domToWorkspace(this.workspace, Blockly.Xml.textToDom(text));
+				}
+			},
+
+			onWindowResize_() {
+				let rect = this.getBoundingClientRect();
+				if(rect.width && rect.height) {
+					this.$.blockDiv.style.left 		= '0px';
+					this.$.blockDiv.style.top 		= '0px';
+					this.$.blockDiv.style.width 	= `${rect.width}px`;
+					this.$.blockDiv.style.height 	= `${rect.height}px`;
+				}
+			},
+
+			onWorkspaceChange_() {
+				this.fire('change');
+			}
+		});
+	</script>
+</dom-module>

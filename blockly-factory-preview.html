@@ -1,0 +1,100 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./blockly.html">
+<link rel="import" href="./blockly-workspace.html">
+<link rel="stylesheet" type="text/css" href="../flexb0x/flexb0x.css">
+
+<dom-module id="blockly-factory-preview">
+	<template>
+		<style>
+			:host {
+				position: relative;
+			}
+		</style>
+
+		<blockly-workspace id="preview" class="fl-full" resizable></blockly-workspace>
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'blockly-factory-preview',
+
+			properties: {
+				source: String,
+				factoryEditor: {
+					type: Element,
+					computed: 'getFactoryEditor_(source, attached_)'
+				},
+
+				attached_: Boolean
+			},
+
+			// get factory editor element when source property is changed
+			getFactoryEditor_(source) {
+				let el = document.getElementById(source);
+				if(el) {
+					el.addEventListener('change', () => this.refresh());
+					//TODO remove old el's event handler
+				}
+				return el;
+			},
+
+			attached() {
+				// if source element is in another polymer component
+				// we have to wait till attached to get a reference to the actual element
+				// thus we use this hack to force "factoryEditor" property to update
+				// http://stackoverflow.com/questions/27206003/manually-recalculate-computed-properties
+				this.attached_ = true;
+			},
+
+			/**
+			 * Update the preview display.
+			 */
+			refresh() {
+				this.$.preview.workspace.clear();
+				let code = this.factoryEditor ? this.factoryEditor.code.trim() : '';
+
+				if (!code) {
+					// Nothing to render.  Happens while cloud storage is loading.
+					return;
+				}
+
+				// Backup Blockly.Blocks object so that main workspace and preview don't
+				// collide if user creates a 'factory_base' block, for instance.
+				var backupBlocks = Blockly.Blocks;
+				try {
+					// Make a shallow copy.
+					Blockly.Blocks = {};
+					for (var prop in backupBlocks) {
+						Blockly.Blocks[prop] = backupBlocks[prop];
+					}
+					eval(code);
+
+					// Look for a block on Blockly.Blocks that does not match the backup.
+					var blockType = null;
+					for (var type in Blockly.Blocks) {
+						if (typeof Blockly.Blocks[type].init == 'function' &&
+							Blockly.Blocks[type] != backupBlocks[type]) {
+							blockType = type;
+							break;
+						}
+					}
+					if (!blockType) {
+						return;
+					}
+
+					// Create the preview block.
+					var previewBlock = this.$.preview.workspace.newBlock(blockType);
+					previewBlock.initSvg();
+					previewBlock.render();
+					previewBlock.setMovable(false);
+					previewBlock.setDeletable(false);
+					previewBlock.moveBy(15, 10);
+				} finally {
+					Blockly.Blocks = backupBlocks;
+				}
+			}
+		});
+	</script>
+</dom-module>

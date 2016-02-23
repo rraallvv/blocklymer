@@ -1,0 +1,31 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./blockly-factory-workspace.html">
+<link rel="import" href="./blockly-factory-preview.html">
+<link rel="stylesheet" type="text/css" href="../flexb0x/flexb0x.css">
+
+<dom-module id="blockly-factory">
+	<template>
+		<style>
+			:host {
+				position: relative;
+			}
+
+			#wrapper > * {
+				width: 50%;
+			}
+		</style>
+
+		<div id="wrapper" class="fl-full fl-hbox">
+			<blockly-factory-workspace id="editor"></blockly-factory-workspace>
+			<blockly-factory-preview id="preview" source="editor"></blockly-factory-preview>
+		</div>
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'blockly-factory'
+		});
+	</script>
+</dom-module>

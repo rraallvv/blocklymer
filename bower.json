@@ -1,0 +1,28 @@
+{
+  "name": "blocklymer",
+  "authors": [
+    "Oscar Tong <moscartong@gmail.com>"
+  ],
+  "description": "Blockly + Polymer",
+  "main": "blockly-factory.html",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "blockly"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "google-blockly": "*",
+    "polymer": "Polymer/polymer#^1.2.0",
+    "flexb0x": "*"
+  }
+}
