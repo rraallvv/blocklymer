@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<script src="../ace-builds/src-min-noconflict/ace.js"></script>
+<link rel="import" href="./ace-editor.html">
 
 <dom-module id="blockly-factory-editor">
 	<template>
@@ -14,29 +14,10 @@
 				/* not sure why part of the top is shifted outside */
 				margin-top: 4px;
 			}
-
-			#defCodeEditor ::content .ace_cursor-layer {
-				/* hide cursor in def code editor */
-				display: none;
-			}
-
-			/* sync gutter size between editors */
-			#defCodeEditor[pd="1"] ::content .ace_gutter-layer {
-				width: 48px !important;
-			}
-			#defCodeEditor[pd="1"] ::content .ace_scroller {
-				left: 48px !important;
-			}
-			#defCodeEditor[pd="2"] ::content .ace_gutter-layer {
-				width: 55px !important;
-			}
-			#defCodeEditor[pd="2"] ::content .ace_scroller {
-				left: 55px !important;
-			}
 		</style>
 
-		<div id="defCodeEditor"></div>
-		<div id="implCodeEditor"></div>
+		<ace-editor id="defCodeEditor" readonly no-highlight on-change="onDefCodeEditorChange_"></ace-editor>
+		<ace-editor id="implCodeEditor" on-change="onImplCodeEditorChange_"></ace-editor>
 	</template>
 
 	<script>
@@ -57,64 +38,24 @@
 				'tap': 'onTap_'
 			},
 
-			ready() {
-				let theme = 'ace/theme/monokai',
-					mode = 'ace/mode/javascript',
-					maxLines = Infinity,
-					options = {maxLines},
-					defCodeEditor = ace.edit(this.$.defCodeEditor),
-					implCodeEditor = ace.edit(this.$.implCodeEditor);
-
-				defCodeEditor.setTheme(theme);
-				defCodeEditor.setReadOnly(true);
-				defCodeEditor.setHighlightGutterLine(false);
-				defCodeEditor.setHighlightActiveLine(false);
-				defCodeEditor.setShowPrintMargin(false);
-				defCodeEditor.setOptions(options);
-				defCodeEditor.getSession().setMode(mode);
-				defCodeEditor.$blockScrolling = Infinity;
-				defCodeEditor.on('change', this.onDefCodeEditorChange_.bind(this));
-
-				implCodeEditor.setTheme(theme);
-				implCodeEditor.setShowPrintMargin(false);
-				implCodeEditor.setOptions(options);
-				implCodeEditor.getSession().setMode(mode);
-				implCodeEditor.$blockScrolling = Infinity;
-				implCodeEditor.on('change', this.onImplCodeEditorChange_.bind(this));
-				
-				this.defCodeEditor = defCodeEditor;
-				this.implCodeEditor = implCodeEditor;
-			},
-
-			get defCodeLength() {
-				return this.defCodeEditor.getSession().getDocument().getLength();
-			},
-
-			get implCodeLength() {
-				return this.implCodeEditor.getSession().getDocument().getLength();
-			},
-
 			onDefCodeChange_(code) {
-				this.defCodeEditor.setValue(code, 1);
+				this.$.defCodeEditor.value = code;
 			},
 
 			onDefCodeEditorChange_() {
-				this.implCodeEditor.setOption('firstLineNumber', this.defCodeLength + 1);
+				this.$.implCodeEditor.firstLineNumber = this.$.defCodeEditor.lineCount + 1;
 			},
 
 			onImplCodeEditorChange_() {
-				let defLength = this.defCodeLength,
-					implLength = this.implCodeLength + defLength,
+				let defLength = this.$.defCodeEditor.lineCount,
+					implLength = this.$.implCodeEditor.lineCount + defLength,
 					diff = implLength.toString().length - defLength.toString().length;
-				if(diff > 0) {
-					// pd = padding diff
-					this.$.defCodeEditor.setAttribute('pd', diff);
-				}
+				this.$.defCodeEditor.gutterIndent = diff;
 			},
 
 			onTap_(e) {
 				if(e.target === this) {
-					this.implCodeEditor.focus();
+					this.$.implCodeEditor.focus();
 				}
 			}
 		});

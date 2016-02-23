@@ -1,0 +1,92 @@
+<link rel="import" href="../polymer/polymer.html">
+<script src="../ace-builds/src-min-noconflict/ace.js"></script>
+
+<dom-module id="ace-editor">
+	<template>
+		<style>
+			:host.hide-cursor ::content .ace_cursor-layer {
+				display: none;
+			}
+
+			:host[indent="1"] ::content .ace_gutter-layer {
+				width: 48px !important;
+			}
+			:host[indent="1"] ::content .ace_scroller-layer {
+				left: 48px !important;
+			}
+			:host[indent="2"] ::content .ace_gutter-layer {
+				width: 55px !important;
+			}
+			:host[indent="2"] ::content .ace_scroller-layer {
+				left: 55px !important;
+			}
+		</style>
+		<div id="editor"></div>
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'ace-editor',
+
+			properties: {
+				theme: {
+					type: String,
+					value: 'ace/theme/monokai'
+				},
+				mode: {
+					type: String,
+					value: 'ace/mode/javascript'
+				},
+				readonly: Boolean,
+				noHighlight: Boolean,
+				hidePrintMargin: Boolean
+			},
+
+			ready() {
+				// create and initialize the editor
+				this.editor = ace.edit(this.$.editor);
+				this.editor.setTheme(this.theme);
+				this.editor.setReadOnly(this.readonly);
+				this.editor.setHighlightGutterLine(!this.noHighlight);
+				this.editor.setHighlightActiveLine(!this.noHighlight);
+				this.editor.setShowPrintMargin(!this.hidePrintMargin);
+				this.editor.setOptions({maxLines:Infinity});
+				this.editor.getSession().setMode(this.mode);
+				this.editor.$blockScrolling = Infinity;
+				this.editor.on('change', this.onChange_.bind(this));
+
+				// update styles
+				if(this.noHighlight) {
+					this.classList.add('hide-cursor');
+				}
+			},
+
+			get lineCount() {
+				return this.editor.getSession().getDocument().getLength();
+			},
+
+			set gutterIndent(value) {
+				if(value > 0) this.setAttribute('indent', value);
+				else this.removeAttribute('indent');
+			},
+
+			set value(value) {
+				this.editor.setValue(value, 1);
+			},
+
+			set firstLineNumber(value) {
+				this.editor.setOption('firstLineNumber', value);
+			},
+
+			focus() {
+				this.editor.focus();
+			},
+
+			onChange_() {
+				this.fire('change');
+			}
+		});
+	</script>
+</dom-module>
