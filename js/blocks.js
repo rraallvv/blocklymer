@@ -23,6 +23,15 @@
  */
 'use strict';
 
+Blockly.JavaScript.statementToCodeWithIndent = function(block, statementName, indent) {
+	let lines = Blockly.JavaScript.statementToCode(block, statementName).split('\n'),
+		spaces = '  '.repeat(indent || 0);
+	for(let i=0; i<lines.length; ++i) {
+		lines[i] = spaces + lines[i];
+	}
+	return lines.join('\n');
+}
+
 Blockly.Blocks['factory_base'] = {
 	// Base of new block.
 	init: function() {

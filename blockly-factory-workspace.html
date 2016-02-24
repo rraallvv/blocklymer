@@ -144,9 +144,11 @@
 			 */
 			formatJavaScript_(blockType, rootBlock) {
 				var code = [];
+				code.push('"use strict";');
+				code.push('');
 				code.push('// This is the block definition');
 				code.push("Blockly.Blocks['" + blockType + "'] = {");
-				code.push("    init: function() {");
+				code.push("  init: function() {");
 
 				let inputs = {
 					fields: [],
@@ -169,19 +171,19 @@
 							name = this.escapeString_(contentsBlock.getFieldValue('INPUTNAME'));
 							inputs[contentsBlock.type].push(contentsBlock.getFieldValue('INPUTNAME'));
 						}
-						code.push('        this.' + TYPES[contentsBlock.type] + '(' + name + ')');
+						code.push('    this.' + TYPES[contentsBlock.type] + '(' + name + ')');
 						var check = this.getOptTypesFrom_(contentsBlock, 'TYPE');
 						if (check) {
-							code.push('            .setCheck(' + check + ')');
+							code.push('        .setCheck(' + check + ')');
 						}
 						var align = contentsBlock.getFieldValue('ALIGN');
 						if (align != 'LEFT') {
-							code.push('            .setAlign(Blockly.ALIGN_' + align + ')');
+							code.push('        .setAlign(Blockly.ALIGN_' + align + ')');
 						}
 						let fields = this.getFieldsJs_(contentsBlock.getInputTargetBlock('FIELDS'));
 						for (var i = 0; i < fields.length; i++) {
 							if(fields[i].name) inputs.fields.push(fields[i].name);
-							code.push('            .appendField(' + fields[i].js + ')');
+							code.push('        .appendField(' + fields[i].js + ')');
 						}
 						// Add semicolon to last line to finish the statement.
 						code[code.length - 1] += ';';
@@ -191,65 +193,65 @@
 				}
 				// Generate inline/external switch.
 				if (rootBlock.getFieldValue('INLINE') == 'EXT') {
-					code.push('        this.setInputsInline(false);');
+					code.push('    this.setInputsInline(false);');
 				} else if (rootBlock.getFieldValue('INLINE') == 'INT') {
-					code.push('        this.setInputsInline(true);');
+					code.push('    this.setInputsInline(true);');
 				}
 				// Generate output, or next/previous connections.
 				switch (rootBlock.getFieldValue('CONNECTIONS')) {
 					case 'LEFT':
-						code.push('    ' + this.connectionLineJs_('setOutput', 'OUTPUTTYPE'));
+						code.push(this.connectionLineJs_('setOutput', 'OUTPUTTYPE'));
 						break;
 					case 'BOTH':
-						code.push('    ' + this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
-						code.push('    ' + this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
+						code.push(this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
+						code.push(this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
 						break;
 					case 'TOP':
-						code.push('    ' + this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
+						code.push(this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
 						break;
 					case 'BOTTOM':
-						code.push('    ' + this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
+						code.push(this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
 						break;
 				}
 				// Generate colour.
 				var colourBlock = rootBlock.getInputTargetBlock('COLOUR');
 				if (colourBlock && !colourBlock.disabled) {
 					var hue = parseInt(colourBlock.getFieldValue('HUE'), 10);
-					code.push(`        this.setColour(${hue});`);
+					code.push(`    this.setColour(${hue});`);
 				}
 				// Generate Tooltip
 				var tooltipBlock = rootBlock.getInputTargetBlock('TOOLTIP');
 				if (tooltipBlock && !tooltipBlock.disabled) {
 					var tooltip = this.escapeString_(tooltipBlock.getFieldValue('TEXT'));
-					code.push(`        this.setTooltip(${tooltip});`);
+					code.push(`    this.setTooltip(${tooltip});`);
 				}
 				// Generate HelpUrl
 				var helpBlock = rootBlock.getInputTargetBlock('HELP');
 				if (helpBlock && !helpBlock.disabled) {
 					var url = this.escapeString_(helpBlock.getFieldValue('TEXT'));
-					code.push(`        this.setHelpUrl(${url});`);
+					code.push(`    this.setHelpUrl(${url});`);
 				}
 				
-				code.push('    }');
+				code.push('  }');
 				code.push('};\n');
-
-				let opts = {};
-				_.each(inputs.fields, (fieldName) => {
-					opts[fieldName] = `block.getFieldValue('${fieldName}')`;
-				});
-				_.each(inputs.input_value, (valueName) => {
-					opts[valueName] = `(Blockly.JavaScript.valueToCode(block, '${valueName}', Blockly.JavaScript.ORDER_ATOMIC) || '')`;
-				});
-				_.each(inputs.input_statement, (statementName) => {
-					opts[statementName] = `Blockly.JavaScript.statementToCode(block, '${statementName}')`;
-				});
 
 				code.push('// This is the code generating function');
 				code.push(`Blockly.JavaScript['${blockType}'] = function(block) {`);
-				code.push(`    let code =\n    '${blockType}({' +`);
-				_.each(opts, (content, name) => code.push(`    '    "${name}": ' + ${content} +`));
-				code.push(`    '})';`);
-				code.push(`    return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];`);
+				code.push(`  let BJS = Blockly.JavaScript;`);
+				code.push(`  let code =`);
+				code.push(`    "${blockType}({\\n" +`);
+
+				let fieldTemplate 			= (name) => `    "  '${name}': '" + block.getFieldValue('${name}') + "'`,
+					inputValueTemplate 		= (name) => `    "  '${name}': " + (BJS.valueToCode(block, '${name}', BJS.ORDER_ATOMIC) || null) + "`,
+					inputStatementTemplate 	= (name) => `    "  '${name}': () => {\\n" + BJS.statementToCodeWithIndent(block, '${name}', 1) + "\\n  }`,
+					fieldCodes 			= _.map(inputs.fields, 			fieldTemplate),
+					inputValueCodes 	= _.map(inputs.input_value, 	inputValueTemplate),
+					inputStatementCodes = _.map(inputs.input_statement, inputStatementTemplate),
+					inputCodes 			= fieldCodes.concat(inputValueCodes, inputStatementCodes).join(',\\n" +\n') + '\\n" +';
+				code.push(inputCodes);
+				
+				code.push(`    "})";`);
+				code.push(`  return [code, BJS.ORDER_FUNCTION_CALL];`);
 				code.push('};\n');
 
 				this._setInputs(inputs);
