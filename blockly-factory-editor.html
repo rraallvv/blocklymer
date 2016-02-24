@@ -38,19 +38,27 @@
 				'tap': 'onTap_'
 			},
 
+			updateLineNumber_() {
+				// update impl code editor first line number
+				this.$.implCodeEditor.firstLineNumber = this.$.defCodeEditor.lineCount + 1;
+
+				// update style
+				let defLength = this.$.defCodeEditor.lineCount,
+					implLength = this.$.implCodeEditor.lineCount + defLength,
+					indent = implLength.toString().length;
+				this.$.defCodeEditor.gutterIndent = indent;
+			},
+
 			onDefCodeChange_(code) {
 				this.$.defCodeEditor.value = code;
 			},
 
 			onDefCodeEditorChange_() {
-				this.$.implCodeEditor.firstLineNumber = this.$.defCodeEditor.lineCount + 1;
+				this.updateLineNumber_();
 			},
 
 			onImplCodeEditorChange_() {
-				let defLength = this.$.defCodeEditor.lineCount,
-					implLength = this.$.implCodeEditor.lineCount + defLength,
-					diff = implLength.toString().length - defLength.toString().length;
-				this.$.defCodeEditor.gutterIndent = diff;
+				this.updateLineNumber_();
 			},
 
 			onTap_(e) {
