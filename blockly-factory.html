@@ -9,10 +9,7 @@
 		<style>
 			:host {
 				position: relative;
-			}
-
-			#wrapper > * {
-				width: 50%;
+				min-width: 1150px;
 			}
 
 			#preview ::content .blocklyMainBackground {
@@ -21,11 +18,11 @@
 		</style>
 
 		<div id="wrapper" class="fl-full fl-hbox">
-			<div class="fl-vbox">
+			<div class="fl-vbox" style="width: 500px;">
 				<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
 				<blockly-factory-preview id="preview" source="workspace" dynamic-height></blockly-factory-preview>
 			</div>
-			<blockly-factory-editor id="editor"></blockly-factory-editor>
+			<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
 		</div>
 	</template>
 
@@ -36,8 +33,10 @@
 			is: 'blockly-factory',
 
 			onWorkspaceChange_() {
-				// workspace.code -> editor.defCode
-				this.$.editor.defCode = this.$.workspace.code;
+				this.$.editor.defCode = {
+					blockType: 	this.$.workspace.blockType,
+					code: 		this.$.workspace.code
+				}
 			}
 		});
 	</script>

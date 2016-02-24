@@ -12,19 +12,16 @@
 				overflow: scroll;
 				background-color: #272822;
 			}
-
-			#defCodeEditor {
-				/* not sure why part of the top is shifted outside */
-				margin-top: 4px;
-			}
 		</style>
 
 		<ace-editor-stack id="stack" class="fl-full">
-			<ace-editor id="defCodeEditor" readonly disable-syntax-check></ace-editor>
-			<ace-editor readonly disable-syntax-check>// Here is the actual implementation
-function foo() {</ace-editor>
-			<ace-editor id="implCodeEditor"></ace-editor>
-			<ace-editor readonly disable-syntax-check>}</ace-editor>
+			<!-- definition code output by the blockly factory workspace -->
+			<ace-editor id="defCodeEditor" readonly disable-syntax-check wrap></ace-editor>
+
+			<!-- implementation code written by the user -->
+			<ace-editor id="prefix" readonly disable-syntax-check wrap></ace-editor>
+			<ace-editor id="implCodeEditor" wrap></ace-editor>
+			<ace-editor readonly disable-syntax-check wrap>}</ace-editor>
 		</ace-editor-stack>
 	</template>
 
@@ -36,18 +33,20 @@ function foo() {</ace-editor>
 
 			properties: {
 				defCode: {
-					type: String,
+					type: Object,
 					notify: true,
 					observer: 'onDefCodeChange_'
-				}
+				},
+				blockType: String
 			},
 
 			listeners: {
 				'stack.tap': 'onTap_'
 			},
 
-			onDefCodeChange_(code) {
-				this.$.defCodeEditor.code = code;
+			onDefCodeChange_(defCode) {
+				this.$.prefix.code = `// Here is the actual implementation\nfunction ${defCode.blockType}() {`;
+				this.$.defCodeEditor.code = defCode.code;
 			},
 
 			onTap_(e) {

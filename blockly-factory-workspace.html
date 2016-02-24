@@ -2,6 +2,7 @@
 <link rel="import" href="./blockly.html">
 <link rel="import" href="./blockly-workspace.html">
 <link rel="stylesheet" type="text/css" href="../flexb0x/flexb0x.css">
+<script src="../underscore/underscore-min.js"></script>
 <script src="./js/blocks.js"></script>
 
 <dom-module id="blockly-factory-workspace">
@@ -83,20 +84,34 @@
 				code: {
 					type: String,
 					notify: true
+				},
+				blockType: {
+					type: String,
+					readOnly: true
+				},
+				inputs: {
+					type: Object,
+					readOnly: true
 				}
 			},
 
 			// get the generated block definition code
 			get code_() {
+				// get the root block
 				let rootBlock = this.rootBlock_;
 				if (!rootBlock) {
 					return '';
 				}
+
+				// get the block type
 				let blockType = rootBlock.getFieldValue('NAME').trim().toLowerCase();
 				if (!blockType) {
 					blockType = 'unnamed';
 				}
 				blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
+				this._setBlockType(blockType);
+
+				// generate javascript
 				return this.formatJavaScript_(blockType, rootBlock);
 			},
 
@@ -117,12 +132,7 @@
 			 */
 			get rootBlock_() {
 				let blocks = this.$.workspace.workspace.getTopBlocks(false);
-				for(let block of blocks) {
-					if(block.type === 'factory_base') {
-						return block;
-					}
-				}
-				return null;
+				return _.find(blocks, (block) => block.type === 'factory_base');
 			},
 
 			/**
@@ -137,6 +147,13 @@
 				code.push('// This is the block definition');
 				code.push("Blockly.Blocks['" + blockType + "'] = {");
 				code.push("    init: function() {");
+
+				let inputs = {
+					fields: [],
+					input_value: [],
+					input_statement: []
+				};
+
 				// Generate inputs.
 				var TYPES = {
 					'input_value': 'appendValueInput',
@@ -150,6 +167,7 @@
 						// Dummy inputs don't have names.  Other inputs do.
 						if (contentsBlock.type != 'input_dummy') {
 							name = this.escapeString_(contentsBlock.getFieldValue('INPUTNAME'));
+							inputs[contentsBlock.type].push(contentsBlock.getFieldValue('INPUTNAME'));
 						}
 						code.push('        this.' + TYPES[contentsBlock.type] + '(' + name + ')');
 						var check = this.getOptTypesFrom_(contentsBlock, 'TYPE');
@@ -160,9 +178,10 @@
 						if (align != 'LEFT') {
 							code.push('            .setAlign(Blockly.ALIGN_' + align + ')');
 						}
-						var fields = this.getFieldsJs_(contentsBlock.getInputTargetBlock('FIELDS'));
+						let fields = this.getFieldsJs_(contentsBlock.getInputTargetBlock('FIELDS'));
 						for (var i = 0; i < fields.length; i++) {
-							code.push('            .appendField(' + fields[i] + ')');
+							if(fields[i].name) inputs.fields.push(fields[i].name);
+							code.push('            .appendField(' + fields[i].js + ')');
 						}
 						// Add semicolon to last line to finish the statement.
 						code[code.length - 1] += ';';
@@ -214,11 +233,26 @@
 				code.push('    }');
 				code.push('};\n');
 
+				let opts = {};
+				_.each(inputs.fields, (fieldName) => {
+					opts[fieldName] = `block.getFieldValue('${fieldName}')`;
+				});
+				_.each(inputs.input_value, (valueName) => {
+					opts[valueName] = `(Blockly.JavaScript.valueToCode(block, '${valueName}', Blockly.JavaScript.ORDER_ATOMIC) || '')`;
+				});
+				_.each(inputs.input_statement, (statementName) => {
+					opts[statementName] = `Blockly.JavaScript.statementToCode(block, '${statementName}')`;
+				});
+
 				code.push('// This is the code generating function');
 				code.push(`Blockly.JavaScript['${blockType}'] = function(block) {`);
-				code.push(`    return ['${blockType}()', Blockly.JavaScript.ORDER_FUNCTION_CALL];`);
+				code.push(`    let code =\n    '${blockType}({' +`);
+				_.each(opts, (content, name) => code.push(`    '    "${name}": ' + ${content} +`));
+				code.push(`    '})';`);
+				code.push(`    return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];`);
 				code.push('};\n');
 
+				this._setInputs(inputs);
 				return code.join('\n');
 			},
 
@@ -232,46 +266,59 @@
 				var fields = [];
 				while (block) {
 					if (!block.disabled && !block.getInheritedDisabled()) {
+						let name = block.getFieldValue('FIELDNAME');
+
 						switch (block.type) {
 							case 'field_static':
 								// Result: 'hello'
-								fields.push(this.escapeString_(block.getFieldValue('TEXT')));
+								fields.push({js:this.escapeString_(block.getFieldValue('TEXT'))});
 								break;
 							case 'field_input':
 								// Result: new Blockly.FieldTextInput('Hello'), 'GREET'
-								fields.push('new Blockly.FieldTextInput(' +
-									this.escapeString_(block.getFieldValue('TEXT')) + '), ' +
-									this.escapeString_(block.getFieldValue('FIELDNAME')));
+								fields.push({name,
+									js: 'new Blockly.FieldTextInput(' +
+										this.escapeString_(block.getFieldValue('TEXT')) + '), ' +
+										this.escapeString_(name)
+								});
 								break;
 							case 'field_angle':
 								// Result: new Blockly.FieldAngle(90), 'ANGLE'
-								fields.push('new Blockly.FieldAngle(' +
-									parseFloat(block.getFieldValue('ANGLE')) + '), ' +
-									this.escapeString_(block.getFieldValue('FIELDNAME')));
+								fields.push({name,
+									js: 'new Blockly.FieldAngle(' +
+										parseFloat(block.getFieldValue('ANGLE')) + '), ' +
+										this.escapeString_(name)
+								});
 								break;
 							case 'field_checkbox':
 								// Result: new Blockly.FieldCheckbox('TRUE'), 'CHECK'
-								fields.push('new Blockly.FieldCheckbox(' +
-									this.escapeString_(block.getFieldValue('CHECKED')) + '), ' +
-									this.escapeString_(block.getFieldValue('FIELDNAME')));
+								fields.push({name,
+									js: 'new Blockly.FieldCheckbox(' +
+										this.escapeString_(block.getFieldValue('CHECKED')) + '), ' +
+										this.escapeString_(name)
+								});
 								break;
 							case 'field_colour':
 								// Result: new Blockly.FieldColour('#ff0000'), 'COLOUR'
-								fields.push('new Blockly.FieldColour(' +
-									this.escapeString_(block.getFieldValue('COLOUR')) + '), ' +
-									this.escapeString_(block.getFieldValue('FIELDNAME')));
+								fields.push({name,
+									js: 'new Blockly.FieldColour(' +
+										this.escapeString_(block.getFieldValue('COLOUR')) + '), ' +
+										this.escapeString_(name)
+								});
 								break;
 							case 'field_date':
 								// Result: new Blockly.FieldDate('2015-02-04'), 'DATE'
-								fields.push('new Blockly.FieldDate(' +
-									this.escapeString_(block.getFieldValue('DATE')) + '), ' +
-									this.escapeString_(block.getFieldValue('FIELDNAME')));
+								fields.push({name,
+									js: 'new Blockly.FieldDate(' +
+										this.escapeString_(block.getFieldValue('DATE')) + '), ' +
+										this.escapeString_(name)
+								});
 								break;
 							case 'field_variable':
 								// Result: new Blockly.FieldVariable('item'), 'VAR'
 								var varname = this.escapeString_(block.getFieldValue('TEXT') || null);
-								fields.push('new Blockly.FieldVariable(' + varname + '), ' +
-									this.escapeString_(block.getFieldValue('FIELDNAME')));
+								fields.push({name,
+									js: 'new Blockly.FieldVariable(' + varname + '), ' + this.escapeString_(name)
+								});
 								break;
 							case 'field_dropdown':
 								// Result:
@@ -282,9 +329,9 @@
 										', ' + this.escapeString_(block.getFieldValue('CPU' + i)) + ']';
 								}
 								if (options.length) {
-									fields.push('new Blockly.FieldDropdown([' +
-										options.join(', ') + ']), ' +
-										this.escapeString_(block.getFieldValue('FIELDNAME')));
+									fields.push({name,
+										js:'new Blockly.FieldDropdown([' + options.join(', ') + ']), ' + this.escapeString_(name)
+									});
 								}
 								break;
 							case 'field_image':
@@ -293,8 +340,9 @@
 								var width = Number(block.getFieldValue('WIDTH'));
 								var height = Number(block.getFieldValue('HEIGHT'));
 								var alt = this.escapeString_(block.getFieldValue('ALT'));
-								fields.push('new Blockly.FieldImage(' +
-									src + ', ' + width + ', ' + height + ', ' + alt + ')');
+								fields.push({name,
+									js: 'new Blockly.FieldImage(' + src + ', ' + width + ', ' + height + ', ' + alt + ')'
+								});
 								break;
 						}
 					}

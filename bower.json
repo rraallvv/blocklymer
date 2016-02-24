@@ -26,6 +26,7 @@
     "polymer": "Polymer/polymer#^1.2.0",
     "flexb0x": "*",
     "ace-builds": "^1.2.3",
-    "acelymer": "*"
+    "acelymer": "*",
+    "underscore": "^1.8.3"
   }
 }
