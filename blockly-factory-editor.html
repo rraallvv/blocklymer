@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="./ace-editor.html">
+<link rel="import" href="../acelymer/ace-editor.html">
 
 <dom-module id="blockly-factory-editor">
 	<template>
@@ -50,7 +50,7 @@
 			},
 
 			onDefCodeChange_(code) {
-				this.$.defCodeEditor.value = code;
+				this.$.defCodeEditor.code = code;
 			},
 
 			onDefCodeEditorChange_() {

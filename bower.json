@@ -3,6 +3,7 @@
   "authors": [
     "Oscar Tong <moscartong@gmail.com>"
   ],
+  "version": "1.0.0",
   "description": "Blockly + Polymer",
   "main": "blockly-factory.html",
   "moduleType": [
@@ -24,6 +25,7 @@
     "google-blockly": "*",
     "polymer": "Polymer/polymer#^1.2.0",
     "flexb0x": "*",
-    "ace-builds": "^1.2.3"
+    "ace-builds": "^1.2.3",
+    "acelymer": "*"
   }
 }
