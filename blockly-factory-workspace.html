@@ -134,6 +134,7 @@
 			 */
 			formatJavaScript_(blockType, rootBlock) {
 				var code = [];
+				code.push('// This is the block definition');
 				code.push("Blockly.Blocks['" + blockType + "'] = {");
 				code.push("    init: function() {");
 				// Generate inputs.
@@ -178,17 +179,17 @@
 				// Generate output, or next/previous connections.
 				switch (rootBlock.getFieldValue('CONNECTIONS')) {
 					case 'LEFT':
-						code.push(this.connectionLineJs_('setOutput', 'OUTPUTTYPE'));
+						code.push('    ' + this.connectionLineJs_('setOutput', 'OUTPUTTYPE'));
 						break;
 					case 'BOTH':
-						code.push(this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
-						code.push(this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
+						code.push('    ' + this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
+						code.push('    ' + this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
 						break;
 					case 'TOP':
-						code.push(this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
+						code.push('    ' + this.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
 						break;
 					case 'BOTTOM':
-						code.push(this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
+						code.push('    ' + this.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
 						break;
 				}
 				// Generate colour.
@@ -213,7 +214,10 @@
 				code.push('    }');
 				code.push('};\n');
 
-				code.push(`// Blockly.JavaScript['${blockType}'] = function(block) {`);
+				code.push('// This is the code generating function');
+				code.push(`Blockly.JavaScript['${blockType}'] = function(block) {`);
+				code.push(`    return ['${blockType}()', Blockly.JavaScript.ORDER_FUNCTION_CALL];`);
+				code.push('};\n');
 
 				return code.join('\n');
 			},

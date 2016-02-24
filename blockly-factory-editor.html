@@ -1,11 +1,14 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../acelymer/ace-editor.html">
+<link rel="import" href="../acelymer/ace-editor-stack.html">
 
 <dom-module id="blockly-factory-editor">
 	<template>
 		<style>
 			:host {
 				position: relative;
+			}
+
+			#stack {
 				overflow: scroll;
 				background-color: #272822;
 			}
@@ -16,8 +19,13 @@
 			}
 		</style>
 
-		<ace-editor id="defCodeEditor" readonly no-highlight on-change="onDefCodeEditorChange_"></ace-editor>
-		<ace-editor id="implCodeEditor" on-change="onImplCodeEditorChange_"></ace-editor>
+		<ace-editor-stack id="stack" class="fl-full">
+			<ace-editor id="defCodeEditor" readonly disable-syntax-check></ace-editor>
+			<ace-editor readonly disable-syntax-check>// Here is the actual implementation
+function foo() {</ace-editor>
+			<ace-editor id="implCodeEditor"></ace-editor>
+			<ace-editor readonly disable-syntax-check>}</ace-editor>
+		</ace-editor-stack>
 	</template>
 
 	<script>
@@ -35,34 +43,15 @@
 			},
 
 			listeners: {
-				'tap': 'onTap_'
-			},
-
-			updateLineNumber_() {
-				// update impl code editor first line number
-				this.$.implCodeEditor.firstLineNumber = this.$.defCodeEditor.lineCount + 1;
-
-				// update style
-				let defLength = this.$.defCodeEditor.lineCount,
-					implLength = this.$.implCodeEditor.lineCount + defLength,
-					indent = implLength.toString().length;
-				this.$.defCodeEditor.gutterIndent = indent;
+				'stack.tap': 'onTap_'
 			},
 
 			onDefCodeChange_(code) {
 				this.$.defCodeEditor.code = code;
 			},
 
-			onDefCodeEditorChange_() {
-				this.updateLineNumber_();
-			},
-
-			onImplCodeEditorChange_() {
-				this.updateLineNumber_();
-			},
-
 			onTap_(e) {
-				if(e.target === this) {
+				if(e.target === this.$.stack) {
 					this.$.implCodeEditor.focus();
 				}
 			}
