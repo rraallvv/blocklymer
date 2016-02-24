@@ -12,7 +12,14 @@
 			}
 		</style>
 
-		<blockly-workspace id="workspace" class="fl-full" resizable grid snap ls="workspace" on-change="onWorkspaceChange_">
+		<blockly-workspace id="workspace" class="fl-full"
+						   resizable
+						   grid snap
+						   zoom-start-scale="0.9"
+						   ls="workspace"
+						   on-change="onWorkspaceChange_">
+
+			<!-- toolbox -->
 			<xml class="toolbox">
 				<category name="Input" colour="210">
 					<block type="input_value"></block>
@@ -58,6 +65,8 @@
 					<block type="text"></block>
 				</category>
 			</xml>
+
+			<!-- default initial blocks -->
 			<xml class="blocks">
 				<block type="factory_base" deletable="false" x="10" y="10"></block>
 			</xml>
@@ -126,7 +135,7 @@
 			formatJavaScript_(blockType, rootBlock) {
 				var code = [];
 				code.push("Blockly.Blocks['" + blockType + "'] = {");
-				code.push("  init: function() {");
+				code.push("    init: function() {");
 				// Generate inputs.
 				var TYPES = {
 					'input_value': 'appendValueInput',
@@ -141,18 +150,18 @@
 						if (contentsBlock.type != 'input_dummy') {
 							name = this.escapeString_(contentsBlock.getFieldValue('INPUTNAME'));
 						}
-						code.push('    this.' + TYPES[contentsBlock.type] + '(' + name + ')');
+						code.push('        this.' + TYPES[contentsBlock.type] + '(' + name + ')');
 						var check = this.getOptTypesFrom_(contentsBlock, 'TYPE');
 						if (check) {
-							code.push('        .setCheck(' + check + ')');
+							code.push('            .setCheck(' + check + ')');
 						}
 						var align = contentsBlock.getFieldValue('ALIGN');
 						if (align != 'LEFT') {
-							code.push('        .setAlign(Blockly.ALIGN_' + align + ')');
+							code.push('            .setAlign(Blockly.ALIGN_' + align + ')');
 						}
 						var fields = this.getFieldsJs_(contentsBlock.getInputTargetBlock('FIELDS'));
 						for (var i = 0; i < fields.length; i++) {
-							code.push('        .appendField(' + fields[i] + ')');
+							code.push('            .appendField(' + fields[i] + ')');
 						}
 						// Add semicolon to last line to finish the statement.
 						code[code.length - 1] += ';';
@@ -162,9 +171,9 @@
 				}
 				// Generate inline/external switch.
 				if (rootBlock.getFieldValue('INLINE') == 'EXT') {
-					code.push('    this.setInputsInline(false);');
+					code.push('        this.setInputsInline(false);');
 				} else if (rootBlock.getFieldValue('INLINE') == 'INT') {
-					code.push('    this.setInputsInline(true);');
+					code.push('        this.setInputsInline(true);');
 				}
 				// Generate output, or next/previous connections.
 				switch (rootBlock.getFieldValue('CONNECTIONS')) {
@@ -186,22 +195,22 @@
 				var colourBlock = rootBlock.getInputTargetBlock('COLOUR');
 				if (colourBlock && !colourBlock.disabled) {
 					var hue = parseInt(colourBlock.getFieldValue('HUE'), 10);
-					code.push(`    this.setColour(${hue});`);
+					code.push(`        this.setColour(${hue});`);
 				}
 				// Generate Tooltip
 				var tooltipBlock = rootBlock.getInputTargetBlock('TOOLTIP');
 				if (tooltipBlock && !tooltipBlock.disabled) {
 					var tooltip = this.escapeString_(tooltipBlock.getFieldValue('TEXT'));
-					code.push(`    this.setTooltip(${tooltip});`);
+					code.push(`        this.setTooltip(${tooltip});`);
 				}
 				// Generate HelpUrl
 				var helpBlock = rootBlock.getInputTargetBlock('HELP');
 				if (helpBlock && !helpBlock.disabled) {
 					var url = this.escapeString_(helpBlock.getFieldValue('TEXT'));
-					code.push(`    this.setHelpUrl(${url});`);
+					code.push(`        this.setHelpUrl(${url});`);
 				}
 				
-				code.push('  }');
+				code.push('    }');
 				code.push('};\n');
 
 				code.push(`//Blockly.JavaScript['${blockType}'] = function(block) { ... }`);

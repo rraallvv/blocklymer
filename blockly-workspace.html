@@ -70,14 +70,14 @@
 							colour: 	this.gridColor,
 							snap: 		this.snap
 						} : null,
-						zoom: (this.zoomControls || this.zoomWheel) ? {
+						zoom: {
 							controls: 	this.zoomControls,
 							wheel: 		this.zoomWheel,
 							startScale: this.zoomStartScale,
 							maxScale: 	this.zoomMaxScale,
 							minScale: 	this.zoomMinScale,
 							scaleSpeed: this.zoomScaleSpeed
-						} : null,
+						},
 						toolbox
 					});
 
@@ -148,7 +148,7 @@
 
 			onWorkspaceChange_() {
 				this.ls && this.saveToLS(this.ls);
-				
+
 				this.fire('change');
 			}
 		});
