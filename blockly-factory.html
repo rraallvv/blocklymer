@@ -36,6 +36,7 @@
 			is: 'blockly-factory',
 
 			onWorkspaceChange_() {
+				// workspace.code -> editor.defCode
 				this.$.editor.defCode = this.$.workspace.code;
 			}
 		});

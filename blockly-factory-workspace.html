@@ -12,7 +12,7 @@
 			}
 		</style>
 
-		<blockly-workspace id="workspace" class="fl-full" resizable grid snap on-change="onEditorChange_">
+		<blockly-workspace id="workspace" class="fl-full" resizable grid snap ls="workspace" on-change="onWorkspaceChange_">
 			<xml class="toolbox">
 				<category name="Input" colour="210">
 					<block type="input_value"></block>
@@ -91,7 +91,7 @@
 				return this.formatJavaScript_(blockType, rootBlock);
 			},
 
-			onEditorChange_() {
+			onWorkspaceChange_() {
 				this.code = this.code_;
 				this.fire('change');
 			},

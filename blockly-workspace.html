@@ -46,7 +46,10 @@
 				zoomStartScale: {type:Number, value:1.0},
 				zoomMinScale: 	{type:Number, value:0.3},
 				zoomMaxScale: 	{type:Number, value:3.0},
-				zoomScaleSpeed: {type:Number, value:1.2}
+				zoomScaleSpeed: {type:Number, value:1.2},
+
+				// localStorage key
+				ls: String
 			},
 
 			ready() {
@@ -78,12 +81,14 @@
 						toolbox
 					});
 
-					// populate with blocks
-					let blocks = this.initialBlocksElement;
-					blocks && Blockly.Xml.domToWorkspace(this.workspace, blocks);
-
-					// observe changes
+					// observe workspace change
 					this.workspace.addChangeListener(this.onWorkspaceChange_.bind(this));
+
+					// populate with blocks
+					if(!this.ls || !this.restoreFromLS(this.ls)) {
+						let blocks = this.initialBlocksElement;
+						blocks && Blockly.Xml.domToWorkspace(this.workspace, blocks);
+					}
 				}, 0);
 			},
 
@@ -113,8 +118,22 @@
 			// xml text -> workspace
 			set xmlText(value) {
 				if(this.workspace) {
-					Blockly.Xml/domToWorkspace(this.workspace, Blockly.Xml.textToDom(text));
+					this.workspace.clear();
+					Blockly.Xml.domToWorkspace(this.workspace, Blockly.Xml.textToDom(value));
 				}
+			},
+
+			saveToLS(key) {
+				localStorage[key] = this.xmlText;
+			},
+
+			restoreFromLS(key) {
+				let xmlText = localStorage[key];
+				if(xmlText) {
+					this.xmlText = xmlText;
+					return true;
+				}
+				return false;
 			},
 
 			onWindowResize_() {
@@ -128,6 +147,8 @@
 			},
 
 			onWorkspaceChange_() {
+				this.ls && this.saveToLS(this.ls);
+				
 				this.fire('change');
 			}
 		});
