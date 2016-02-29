@@ -1,0 +1,45 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+
+<dom-module id="blockly-factory-nav">
+	<template>
+		<style>
+			paper-toolbar {
+				--paper-toolbar-background: #333;
+				box-shadow: 0 0 5px 5px #222;
+				z-index: 10;
+			}
+
+			paper-icon-button {
+				--paper-icon-button-ink-color: #fff;
+			}
+		</style>
+
+		<paper-toolbar>
+			<paper-icon-button icon="menu"></paper-icon-button>
+			<span class="title">Block Factory</span>
+			<paper-icon-button icon="icons:file-download" on-tap="onDownloadBtnTap_">+</paper-icon-button>
+			<paper-icon-button icon="icons:delete" on-tap="onClearBtnTap_">x</paper-icon-button>
+		</paper-toolbar>		
+	</template>
+
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'blockly-factory-nav',
+
+			onDownloadBtnTap_() {
+				this.fire('download');
+			},
+
+			onClearBtnTap_() {
+				if(confirm('Are you sure to clear the workspace?')) {
+					this.fire('clear');
+				}
+			}
+		});
+	</script>
+</dom-module>

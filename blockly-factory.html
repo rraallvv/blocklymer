@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./blockly-factory-nav.html">
 <link rel="import" href="./blockly-factory-workspace.html">
 <link rel="import" href="./blockly-factory-preview.html">
 <link rel="import" href="./blockly-factory-editor.html">
@@ -15,15 +16,30 @@
 			blockly-factory-editor {
 				border-right: 1px solid #444;
 			}
+
+			blockly-factory-preview {
+				border-top: 1px solid #444;
+			}
+
+			#downloader {
+				display: none;
+			}
 		</style>
 
-		<div id="wrapper" class="fl-full fl-hbox">
-			<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
-			<div class="fl-vbox" style="width: 600px;">
-				<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
-				<blockly-factory-preview id="preview" source="workspace" dynamic-height></blockly-factory-preview>
+		<div id="wrapper" class="fl-full fl-vbox">
+			<blockly-factory-nav on-download="downloadSource_"
+								 on-clear="clearWorkspace_">
+			</blockly-factory-nav>
+			<div class="fl-fatty fl-hbox">
+				<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
+				<div class="fl-vbox" style="width: 600px;">
+					<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
+					<blockly-factory-preview id="preview" dynamic-height></blockly-factory-preview>
+				</div>
 			</div>
 		</div>
+
+		<a id="downloader"></a>
 	</template>
 
 	<script>
@@ -32,11 +48,23 @@
 		Polymer({
 			is: 'blockly-factory',
 
+			downloadSource_() {
+				let code = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.$.editor.code);
+				this.$.downloader.setAttribute('href', code);
+				this.$.downloader.setAttribute('download', 'block.js');
+				this.$.downloader.click();
+			},
+
+			clearWorkspace_() {
+				this.$.workspace.reset();
+			},
+
 			onWorkspaceChange_() {
 				this.$.editor.defCode = {
 					blockType: 	this.$.workspace.blockType,
 					code: 		this.$.workspace.code
-				}
+				};
+				this.$.preview.refresh(this.$.workspace);
 			}
 		});
 	</script>

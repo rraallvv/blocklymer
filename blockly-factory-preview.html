@@ -21,42 +21,17 @@
 			is: 'blockly-factory-preview',
 
 			properties: {
-				source: String,
-				dynamicHeight: Boolean,
-				factoryEditor: {
-					type: Element,
-					computed: 'getFactoryEditor_(source, attached_)'
-				},
-
-				attached_: Boolean
-			},
-
-			// get factory editor element when source property is changed
-			getFactoryEditor_(source) {
-				let el = document.getElementById(source);
-				if(el) {
-					el.addEventListener('change', () => this.refresh());
-					//TODO remove old el's event handler
-				}
-				return el;
-			},
-
-			attached() {
-				// if source element is in another polymer component
-				// we have to wait till attached to get a reference to the actual element
-				// thus we use this hack to force "factoryEditor" property to update
-				// http://stackoverflow.com/questions/27206003/manually-recalculate-computed-properties
-				this.attached_ = true;
+				dynamicHeight: Boolean
 			},
 
 			/**
 			 * Update the preview display.
 			 */
-			refresh() {
+			refresh(factoryEditor) {
 				let workspace = this.$.preview.workspace;
 				workspace.clear();
 
-				let code = this.factoryEditor ? this.factoryEditor.code.trim() : '';
+				let code = factoryEditor.code.trim();
 
 				if (!code) {
 					// Nothing to render.  Happens while cloud storage is loading.

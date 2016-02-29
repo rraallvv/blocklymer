@@ -12,6 +12,11 @@
 				overflow: scroll;
 				background-color: #272822;
 			}
+
+			ace-editor:first-child ::content .ace_gutter .ace_gutter-cell:first-child,
+			ace-editor:first-child ::content .ace_scroller .ace_line_group:first-child {
+				padding-top: 8px;
+			}
 		</style>
 
 		<ace-editor-stack id="stack" class="fl-full" readonly disable-syntax-check wrap hide-print-margin>
@@ -42,6 +47,10 @@
 
 			listeners: {
 				'stack.tap': 'onTap_'
+			},
+
+			get code() {
+				return this.$.stack.code;
 			},
 
 			onDefCodeChange_(defCode) {

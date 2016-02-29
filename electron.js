@@ -22,8 +22,9 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		width: 1200,
-		height: 800
+		width: 1400,
+		height: 800,
+		titleBarStyle: 'hidden'
 	});
 
 	// and load the index.html of the app.

@@ -69,7 +69,19 @@
 
 			<!-- default initial blocks -->
 			<xml class="blocks">
-				<block type="factory_base" deletable="false" x="10" y="10"></block>
+				<block type="factory_base" deletable="false" x="10" y="10">
+					<value name="COLOUR">
+						<block type="colour_hue">
+							<mutation colour="#5ba58c"></mutation>
+							<field name="HUE">160</field>
+						</block>
+					</value>
+					<value name="TOOLTIP">
+						<block type="text">
+							<field name="TEXT">Just another foo block</field>
+						</block>
+					</value>
+				</block>
 			</xml>
 		</blockly-workspace>
 	</template>
@@ -93,6 +105,10 @@
 					type: Object,
 					readOnly: true
 				}
+			},
+
+			reset() {
+				this.$.workspace.reset();
 			},
 
 			// get the generated block definition code

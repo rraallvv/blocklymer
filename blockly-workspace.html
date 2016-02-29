@@ -86,8 +86,7 @@
 
 					// populate with blocks
 					if(!this.ls || !this.restoreFromLS(this.ls)) {
-						let blocks = this.initialBlocksElement;
-						blocks && Blockly.Xml.domToWorkspace(this.workspace, blocks);
+						this.reset();
 					}
 				}, 0);
 			},
@@ -123,6 +122,12 @@
 				}
 			},
 
+			reset() {
+				this.workspace.clear();
+				let blocks = this.initialBlocksElement;
+				blocks && Blockly.Xml.domToWorkspace(this.workspace, blocks);
+			},
+
 			saveToLS(key) {
 				localStorage[key] = this.xmlText;
 			},
@@ -148,7 +153,6 @@
 
 			onWorkspaceChange_() {
 				this.ls && this.saveToLS(this.ls);
-
 				this.fire('change');
 			}
 		});
