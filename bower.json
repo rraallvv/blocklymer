@@ -3,7 +3,7 @@
   "authors": [
     "Oscar Tong <moscartong@gmail.com>"
   ],
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Blockly + Polymer",
   "main": "blockly-factory.html",
   "moduleType": [
