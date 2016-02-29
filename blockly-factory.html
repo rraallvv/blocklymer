@@ -51,7 +51,7 @@
 			downloadSource_() {
 				let code = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.$.editor.code);
 				this.$.downloader.setAttribute('href', code);
-				this.$.downloader.setAttribute('download', 'block.js');
+				this.$.downloader.setAttribute('download', `${this.$.workspace.blockType}.js`);
 				this.$.downloader.click();
 			},
 
