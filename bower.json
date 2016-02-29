@@ -10,7 +10,9 @@
     "globals"
   ],
   "keywords": [
-    "blockly"
+    "blockly",
+    "factory",
+    "web-components"
   ],
   "license": "MIT",
   "homepage": "",
