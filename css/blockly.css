@@ -1,0 +1,22 @@
+/* blockly workspace */
+.blocklySvg {
+	background-color: #272822 !important;
+}
+.blocklyMainBackground {
+	stroke: none !important;
+}
+.blocklyScrollbarKnob {
+	display: none;
+}
+
+/* blockly toolbox */
+.blocklyToolboxDiv {
+	color: white;
+	background-color: #272822 !important;
+}
+.blocklyTreeRow:not(.blocklyTreeSelected):hover {
+    background-color: #666 !important;
+}
+.blocklyFlyoutBackground {
+	fill: #272822 !important;
+}

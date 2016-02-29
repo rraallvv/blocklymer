@@ -12,17 +12,17 @@
 				min-width: 1150px;
 			}
 
-			#preview ::content .blocklyMainBackground {
-				stroke: none;
+			blockly-factory-editor {
+				border-right: 1px solid #444;
 			}
 		</style>
 
 		<div id="wrapper" class="fl-full fl-hbox">
+			<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
 			<div class="fl-vbox" style="width: 600px;">
 				<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
 				<blockly-factory-preview id="preview" source="workspace" dynamic-height></blockly-factory-preview>
 			</div>
-			<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
 		</div>
 	</template>
 

@@ -14,14 +14,14 @@
 			}
 		</style>
 
-		<ace-editor-stack id="stack" class="fl-full">
+		<ace-editor-stack id="stack" class="fl-full" readonly disable-syntax-check wrap hide-print-margin>
 			<!-- definition code output by the blockly factory workspace -->
-			<ace-editor id="defCodeEditor" readonly disable-syntax-check wrap></ace-editor>
+			<ace-editor id="defCodeEditor"></ace-editor>
 
 			<!-- implementation code written by the user -->
-			<ace-editor id="prefix" readonly disable-syntax-check wrap></ace-editor>
-			<ace-editor id="implCodeEditor" wrap>    </ace-editor>
-			<ace-editor readonly disable-syntax-check wrap>}</ace-editor>
+			<ace-editor id="prefix"></ace-editor>
+			<ace-editor id="implCodeEditor" ignore-stack-prop wrap hide-print-margin>    </ace-editor>
+			<ace-editor>}</ace-editor>
 		</ace-editor-stack>
 	</template>
 
