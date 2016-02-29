@@ -235,22 +235,32 @@
 				code.push('  }');
 				code.push('};\n');
 
-				code.push('// This is the code generating function');
+				code.push(`// This is the code generating function, the generated code looks like this:`);
+				code.push(`// ${blockType}({`);
+				let fieldNames 			= _.map(inputs.fields, 			(name) => `//   '${name}': '...'`),
+					inputValueNames 	= _.map(inputs.input_value, 	(name) => `//   '${name}': '...'`),
+					inputStatementNames = _.map(inputs.input_statement, (name) => `//   '${name}': () => { ... }`);
+				code.push(fieldNames.concat(inputValueNames, inputStatementNames).join(',\n'));
+				code.push(`// })`);
+
 				code.push(`Blockly.JavaScript['${blockType}'] = function(block) {`);
 				code.push(`  let BJS = Blockly.JavaScript;`);
-				code.push(`  let code =`);
-				code.push(`    "${blockType}({\\n" +`);
-
 				let fieldTemplate 			= (name) => `    "  '${name}': '" + block.getFieldValue('${name}') + "'`,
 					inputValueTemplate 		= (name) => `    "  '${name}': " + (BJS.valueToCode(block, '${name}', BJS.ORDER_ATOMIC) || null) + "`,
-					inputStatementTemplate 	= (name) => `    "  '${name}': () => {\\n" + BJS.statementToCodeWithIndent(block, '${name}', 1) + "\\n  }`,
+					inputStatementTemplate 	= (name) => `    "  '${name}': () => {\\n" + BJS.statementToCodeWithIndent(block, '${name}', 1) + "}`,
 					fieldCodes 			= _.map(inputs.fields, 			fieldTemplate),
 					inputValueCodes 	= _.map(inputs.input_value, 	inputValueTemplate),
 					inputStatementCodes = _.map(inputs.input_statement, inputStatementTemplate),
-					inputCodes 			= fieldCodes.concat(inputValueCodes, inputStatementCodes).join(',\\n" +\n') + '\\n" +';
-				code.push(inputCodes);
-				
-				code.push(`    "})";`);
+					inputCodes 			= fieldCodes.concat(inputValueCodes, inputStatementCodes).join(',\\n" +\n');
+				if(inputCodes) {
+					code.push(`  let code =`);
+					code.push(`    "${blockType}({\\n" +`);
+					code.push(inputCodes + '\\n" +');
+					code.push(`    "})";`);
+				}
+				else {
+					code.push(`  let code = "${blockType}({})";`);
+				}
 				code.push(`  return [code, BJS.ORDER_FUNCTION_CALL];`);
 				code.push('};\n');
 

@@ -20,7 +20,7 @@
 
 			<!-- implementation code written by the user -->
 			<ace-editor id="prefix" readonly disable-syntax-check wrap></ace-editor>
-			<ace-editor id="implCodeEditor" wrap></ace-editor>
+			<ace-editor id="implCodeEditor" wrap>    </ace-editor>
 			<ace-editor readonly disable-syntax-check wrap>}</ace-editor>
 		</ace-editor-stack>
 	</template>
@@ -45,7 +45,7 @@
 			},
 
 			onDefCodeChange_(defCode) {
-				this.$.prefix.code = `// Here is the actual implementation\nfunction ${defCode.blockType}() {`;
+				this.$.prefix.code = `// Here is the actual implementation\nfunction ${defCode.blockType}(opts) {`;
 				this.$.defCodeEditor.code = defCode.code;
 			},
 
