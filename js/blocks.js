@@ -23,6 +23,15 @@
  */
 'use strict';
 
+
+// Block
+Blockly.Block.prototype.moveTo = function(x, y) {
+  let xy = this.getRelativeToSurfaceXY();
+  this.moveBy(x - xy.x, y - xy.y);
+};
+
+
+// JavaScript
 Blockly.JavaScript.statementToCodeWithIndent = function(block, statementName, indent) {
 	let lines = Blockly.JavaScript.statementToCode(block, statementName).split('\n'),
 		spaces = '  '.repeat(indent || 0);
@@ -32,10 +41,14 @@ Blockly.JavaScript.statementToCodeWithIndent = function(block, statementName, in
 	return lines.join('\n');
 }
 
+
+// Blocks
 Blockly.Blocks['factory_base'] = {
 	// Base of new block.
 	init: function() {
 		this.setColour(330);
+		this.appendDummyInput()
+			.appendField(new Blockly.FieldLabel('Block Definition', 'blockTitle'));
 		this.appendDummyInput()
 			.appendField('name')
 			.appendField(new Blockly.FieldTextInput('foo'), 'NAME');

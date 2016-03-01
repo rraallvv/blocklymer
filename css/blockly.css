@@ -20,3 +20,8 @@
 .blocklyFlyoutBackground {
 	fill: #272822 !important;
 }
+
+/* custom block style */
+.blockTitle {
+	font-weight: bold;
+}

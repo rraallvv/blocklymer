@@ -15,9 +15,8 @@
 
 		<blockly-workspace id="workspace" class="fl-full"
 						   resizable
-						   snap
+						   snap grid grid-color="#555"
 						   zoom-start-scale="0.9"
-						   ls="workspace"
 						   on-change="onWorkspaceChange_">
 
 			<!-- toolbox -->
@@ -69,7 +68,7 @@
 
 			<!-- default initial blocks -->
 			<xml class="blocks">
-				<block type="factory_base" deletable="false" x="10" y="10">
+				<block type="factory_base" deletable="false" movable="false" x="10" y="10">
 					<value name="COLOUR">
 						<block type="colour_hue">
 							<mutation colour="#5ba58c"></mutation>
@@ -81,6 +80,12 @@
 							<field name="TEXT">Just another foo block</field>
 						</block>
 					</value>
+				</block>
+				<block type="procedures_defnoreturn" deletable="false" movable="false" x="10" y="280">
+					<mutation>
+						<arg name="opts"></arg>
+					</mutation>
+					<field name="NAME">{{blockType}}</field>
 				</block>
 			</xml>
 		</blockly-workspace>
@@ -104,7 +109,19 @@
 				inputs: {
 					type: Object,
 					readOnly: true
-				}
+				},
+
+				defBlock_:  {type:Object, computed:'getDefBlock_(attached_)'},
+				implBlock_: {type:Object, computed:'getImplBlock_(attached_)'},
+				attached_: Boolean
+			},
+
+			attached() {
+				this.attached_ = true;
+				setTimeout(() => {
+					this.implBlock_.setMutator();
+					this.implBlock_.setCommentText();
+				}, 0);
 			},
 
 			reset() {
@@ -131,8 +148,22 @@
 				return this.formatJavaScript_(blockType, rootBlock);
 			},
 
+			getDefBlock_() {
+				return this.$.workspace.workspace.getTopBlocks()[0];
+			},
+
+			getImplBlock_() {
+				return this.$.workspace.workspace.getTopBlocks()[1];
+			},
+
 			onWorkspaceChange_() {
 				this.code = this.code_;
+
+				// make sure impl block is directly below the def block and keeps in sync
+				let y = this.defBlock_.getRelativeToSurfaceXY().y + this.defBlock_.height;
+				this.implBlock_.moveTo(10, y + 20);
+				this.implBlock_.getField('NAME').setValue(this.blockType);
+
 				this.fire('change');
 			},
 
@@ -147,8 +178,9 @@
 			 * @return {Blockly.Block}
 			 */
 			get rootBlock_() {
-				let blocks = this.$.workspace.workspace.getTopBlocks(false);
-				return _.find(blocks, (block) => block.type === 'factory_base');
+				return this.defBlock_;
+				// let blocks = this.$.workspace.workspace.getTopBlocks(false);
+				// return _.find(blocks, (block) => block.type === 'factory_base');
 			},
 
 			/**
