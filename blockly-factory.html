@@ -14,7 +14,7 @@
 			}
 
 			blockly-factory-editor {
-				border-right: 1px solid #444;
+				border-left: 1px solid #444;
 			}
 
 			blockly-factory-preview {
@@ -31,11 +31,11 @@
 								 on-clear="clearWorkspace_">
 			</blockly-factory-nav>
 			<div class="fl-fatty fl-hbox">
-				<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
-				<div class="fl-vbox" style="width: 640px;">
+				<div class="fl-vbox" style="width: 800px;">
 					<blockly-factory-workspace id="workspace" class="fl-fatty" on-change="onWorkspaceChange_"></blockly-factory-workspace>
 					<blockly-factory-preview id="preview" dynamic-height></blockly-factory-preview>
 				</div>
+				<blockly-factory-editor id="editor" class="fl-fatty"></blockly-factory-editor>
 			</div>
 		</div>
 

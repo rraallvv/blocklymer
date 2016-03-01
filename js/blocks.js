@@ -134,6 +134,19 @@ Blockly.Blocks['factory_base'] = {
 		}
 	}
 };
+Blockly.Blocks['factory_base_impl'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Block Implementation', 'blockTitle'));
+    this.appendDummyInput()
+        .appendField("to")
+        .appendField(new Blockly.FieldTextInput("foo"), "NAME")
+        .appendField("with: opts");
+    this.appendStatementInput("CONTENT");
+    this.setColour(260);
+  }
+};
+
 
 var ALIGNMENT_OPTIONS =
 	[

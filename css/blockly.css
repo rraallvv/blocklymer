@@ -10,6 +10,7 @@
 }
 
 /* blockly toolbox */
+/*change toolbox color*/
 .blocklyToolboxDiv {
 	color: white;
 	background-color: #272822 !important;
@@ -19,6 +20,26 @@
 }
 .blocklyFlyoutBackground {
 	fill: #272822 !important;
+}
+/*make toolbox item bigger*/
+.blocklyTreeRow {
+	height: 30px !important;
+	line-height: 30px !important;
+}
+/*hide top folder icon(because they are black) and bold folder label*/
+.blocklyTreeIcon {
+	display: none !important;
+}
+[aria-level="1"] > .blocklyTreeRow > .blocklyTreeLabel {
+	padding: 0 10px;
+	font-weight: bold;
+}
+/*separate top folders*/
+[aria-level="1"] {
+	border-top: 1px solid #444;
+}
+[aria-level="1"]:first-child {
+	border-top: none;
 }
 
 /* custom block style */

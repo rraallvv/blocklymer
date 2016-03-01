@@ -8,26 +8,26 @@
 				position: relative;
 			}
 
-			#stack {
+			#editor {
 				overflow: scroll;
 				background-color: #272822;
 			}
 
+			#editor ::content #editor {
+				padding-bottom: 12px;
+			}
+
+			/* give some gap between the editor and the top nav so that shadow of the nav won't cover the code */
 			ace-editor:first-child ::content .ace_gutter .ace_gutter-cell:first-child,
 			ace-editor:first-child ::content .ace_scroller .ace_line_group:first-child {
 				padding-top: 8px;
 			}
+			ace-editor:first-child ::content .ace_marker-layer {
+				margin-top: 8px;
+			}
 		</style>
 
-		<ace-editor-stack id="stack" class="fl-full" readonly disable-syntax-check wrap hide-print-margin>
-			<!-- definition code output by the blockly factory workspace -->
-			<ace-editor id="defCodeEditor"></ace-editor>
-
-			<!-- implementation code written by the user -->
-			<ace-editor id="prefix"></ace-editor>
-			<ace-editor id="implCodeEditor" ignore-stack-prop wrap hide-print-margin>    </ace-editor>
-			<ace-editor>}</ace-editor>
-		</ace-editor-stack>
+		<ace-editor id="editor" class="fl-full" readonly disable-syntax-check wrap hide-print-margin></ace-editor>
 	</template>
 
 	<script>
@@ -45,23 +45,17 @@
 				blockType: String
 			},
 
-			listeners: {
-				'stack.tap': 'onTap_'
-			},
-
 			get code() {
-				return this.$.stack.code;
+				return this.$.editor.code;
 			},
 
 			onDefCodeChange_(defCode) {
-				this.$.prefix.code = `// Here is the actual implementation\nfunction ${defCode.blockType}(opts) {`;
-				this.$.defCodeEditor.code = defCode.code;
-			},
+				this.$.editor.code = `${defCode.code}
 
-			onTap_(e) {
-				if(e.target === this.$.stack) {
-					this.$.implCodeEditor.focus();
-				}
+// Here is the actual implementation
+function ${defCode.blockType}(opts) {
+
+}`;
 			}
 		});
 	</script>
