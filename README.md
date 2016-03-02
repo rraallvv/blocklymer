@@ -2,8 +2,6 @@
 
 Blocklymer = Blockly + Polymer + Electron
 
-![](https://img.shields.io/bower/v/moscartong/blocklymer.svg)
-
 ## What's this?
 
 ![](doc/blocklymer.png)
