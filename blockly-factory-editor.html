@@ -8,7 +8,7 @@
 				position: relative;
 			}
 
-			#editor {
+			#stack {
 				overflow: scroll;
 				background-color: #272822;
 			}
@@ -27,7 +27,13 @@
 			}
 		</style>
 
-		<ace-editor id="editor" class="fl-full" readonly disable-syntax-check wrap hide-print-margin></ace-editor>
+		<!-- <ace-editor id="editor" class="fl-full" readonly disable-syntax-check wrap hide-print-margin></ace-editor> -->
+		<ace-editor-stack id="stack" class="fl-full" readonly disable-syntax-check wrap hide-print-margin>
+			<ace-editor id="defCodeEditor"></ace-editor>
+			<ace-editor id="implPrefixEditor">// Here is the actual implementation\nfunction foo(opts) {</ace-editor>
+			<ace-editor id="implCodeEditor" ignore-stack-prop wrap hide-print-margin>	</ace-editor>
+			<ace-editor>}</ace-editor>
+		</ace-editor-stack>
 	</template>
 
 	<script>
@@ -46,16 +52,12 @@
 			},
 
 			get code() {
-				return this.$.editor.code;
+				return this.$.stack.code;
 			},
 
 			onDefCodeChange_(defCode) {
-				this.$.editor.code = `${defCode.code}
-
-// Here is the actual implementation
-function ${defCode.blockType}(opts) {
-
-}`;
+				this.$.defCodeEditor.code = defCode.code;
+				this.$.implPrefixEditor.code = `// Here is the actual implementation\nfunction ${defCode.blockType}(opts) {`;
 			}
 		});
 	</script>

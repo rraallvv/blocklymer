@@ -30,9 +30,15 @@
 .blocklyTreeIcon {
 	display: none !important;
 }
-[aria-level="1"] > .blocklyTreeRow > .blocklyTreeLabel {
+/*[aria-level="1"] > .blocklyTreeRow > .blocklyTreeLabel {
 	padding: 0 10px;
 	font-weight: bold;
+}*/
+/*change sep style*/
+.blocklyTreeSeparator {
+	margin: 0 !important;
+	border-left: none !important;
+	border-bottom: 1px dashed #444 !important;
 }
 /*separate top folders*/
 [aria-level="1"] {

@@ -22,7 +22,7 @@
 
 			<!-- toolbox -->
 			<xml class="toolbox">
-				<category name="Define Block" expanded="true">
+				<!-- <category name="Define Block" expanded="true"> -->
 					<category name="Input" colour="210">
 						<block type="input_value"></block>
 						<block type="input_statement"></block>
@@ -66,8 +66,8 @@
 					<category name="Value" colour="30">
 						<block type="text"></block>
 					</category>
-				</category>
-				<category name="Implement Block" expanded="true">
+				<!-- </category> -->
+				<!-- <category name="Implement Block" expanded="true">
 				    <category name="Logic" colour="210">
 				      <block type="controls_if"></block>
 				      <block type="logic_compare"></block>
@@ -365,9 +365,10 @@
 				        </value>
 				      </block>
 				    </category>
+				    <sep></sep>
 				    <category name="Variables" colour="330" custom="VARIABLE"></category>
 				    <category name="Functions" colour="290" custom="PROCEDURE"></category>
-				</category>
+				</category> -->
 			</xml>
 
 			<!-- default initial blocks -->
@@ -385,7 +386,7 @@
 						</block>
 					</value>
 				</block>
-				<block type="factory_base_impl" deletable="false" movable="false" x="10" y="280"></block>
+				<!-- <block type="factory_base_impl" deletable="false" movable="false" x="10" y="280"></block> -->
 			</xml>
 		</blockly-workspace>
 	</template>
@@ -416,7 +417,7 @@
 
 				// main blocks
 				defBlock_:  {type:Object, computed:'getDefBlock_(attached_)'},
-				implBlock_: {type:Object, computed:'getImplBlock_(attached_)'},
+				// implBlock_: {type:Object, computed:'getImplBlock_(attached_)'},
 				attached_: Number
 			},
 
@@ -453,20 +454,17 @@
 				return this.$.workspace.workspace.getTopBlocks()[0];
 			},
 
-			getImplBlock_() {
-				let block = this.$.workspace.workspace.getTopBlocks()[1];
-				// block.setMutator();
-				// block.setCommentText();
-				return block;
-			},
+			// getImplBlock_() {
+			// 	return this.$.workspace.workspace.getTopBlocks()[1];
+			// },
 
 			onWorkspaceChange_() {
 				this.code = this.code_;
 
-				// make sure impl block is directly below the def block and keeps in sync
-				let y = this.defBlock_.getRelativeToSurfaceXY().y + this.defBlock_.height;
-				this.implBlock_.moveTo(10, y + 20);
-				this.implBlock_.getField('NAME').setValue(this.blockType);
+				// // make sure impl block is directly below the def block and keeps in sync
+				// let y = this.defBlock_.getRelativeToSurfaceXY().y + this.defBlock_.height;
+				// this.implBlock_.moveTo(10, y + 20);
+				// this.implBlock_.getField('NAME').setValue(this.blockType);
 
 				this.fire('change');
 			},
